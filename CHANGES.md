@@ -81,6 +81,10 @@ It should be updated whenever a new bug fix is applied.
 - Updated `ikea-jobs-server/src/controllers/applicationController.js`: webhook call runs in parallel with ActiveTrail emails; parses `job` field from JSON string.
 - Updated `ikea-jobs-page/src/services/activeTrailService.ts`: frontend now sends `FormData` (instead of JSON) including the CV file.
 
+### Switch Gmail SMTP from port 465 to 587 (2026-04-25)
+- Changed mailer.js transporter from `service: 'gmail'` to explicit host/port config using port 587 (STARTTLS).
+- Port 465 was blocked by the VPS provider; port 587 is open.
+
 ### Fix logo and banner images missing at /ikea sub-path (2026-04-25)
 - Changed `/ikea-logo.png` and `/banner.avif` src attributes to use `process.env.PUBLIC_URL` prefix.
 - Without the prefix, the browser requested `/ikea-logo.png` which missed the nginx `/ikea/` proxy rule and got redirected to `/login`.
