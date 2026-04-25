@@ -81,6 +81,15 @@ It should be updated whenever a new bug fix is applied.
 - Updated `ikea-jobs-server/src/controllers/applicationController.js`: webhook call runs in parallel with ActiveTrail emails; parses `job` field from JSON string.
 - Updated `ikea-jobs-page/src/services/activeTrailService.ts`: frontend now sends `FormData` (instead of JSON) including the CV file.
 
+### install.sh — automated nginx config patching (2026-04-24)
+- Step 8 now auto-patches giron nginx.conf instead of printing manual instructions.
+- Detects nginx.conf path from `docker inspect` bind mounts of the provided container.
+- Idempotency check: skips if `ikea-frontend` block already present.
+- Backs up config before any edit.
+- Uses embedded Python3 to insert IKEA upstream blocks after the last upstream block and IKEA location blocks before the first `location /` block.
+- Tests config with `nginx -t` inside the container; restores backup on failure.
+- Reloads nginx automatically on success.
+
 ### install.sh — automated server installation script (2026-04-25)
 - Added `install.sh`: full Ubuntu 24 installation from scratch.
 - Prompts for all credentials (recruiter email, Gmail, ADAM API).

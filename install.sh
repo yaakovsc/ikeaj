@@ -270,26 +270,114 @@ check_http "Jobs server"  jobs-server  3001 "/api/send-application"
 check_http "Email service" email-service 3002 "/api/fetch-jobs"
 
 # =============================================================================
-#  STEP 8 — Print nginx snippet
+#  STEP 8 — Patch giron nginx config automatically
 # =============================================================================
 hdr "STEP 8 — Nginx configuration"
 
-echo -e "${BOLD}Add these location blocks inside your nginx server{} block:${NC}\n"
-cat nginx-ikea.conf
-echo
+if [[ -z "$NGINX_CONTAINER" ]]; then
+    warn "No nginx container specified — skipping nginx config patch."
+    warn "Add the blocks from nginx-ikea.conf manually, then reload nginx."
+else
+    # ── Find the nginx.conf path from the container's bind mounts ────────────
+    NGINX_CONF=$(docker inspect "$NGINX_CONTAINER" \
+        --format '{{range .Mounts}}{{if eq .Destination "/etc/nginx/nginx.conf"}}{{.Source}}{{end}}{{end}}' \
+        2>/dev/null)
 
-if [[ -n "$NGINX_CONTAINER" ]]; then
-    ask "Do you want to reload your nginx container now? [y/N]"
-    read -r RELOAD_NGINX
-    if [[ "${RELOAD_NGINX,,}" == "y" ]]; then
-        if docker exec "$NGINX_CONTAINER" nginx -t 2>&1; then
-            docker exec "$NGINX_CONTAINER" nginx -s reload
-            ok "Nginx reloaded"
-        else
-            warn "Nginx config test failed — skipping reload. Add the location blocks manually then reload."
-        fi
+    if [[ -z "$NGINX_CONF" ]]; then
+        warn "Could not detect nginx.conf path from container mounts."
+        warn "Add the blocks from nginx-ikea.conf manually, then reload nginx."
+    elif [[ ! -f "$NGINX_CONF" ]]; then
+        warn "nginx.conf not found at $NGINX_CONF — skipping auto-patch."
     else
-        warn "Skipped nginx reload — remember to add the location blocks and reload manually."
+        info "Found nginx config: $NGINX_CONF"
+
+        # ── Idempotency check ─────────────────────────────────────────────────
+        if grep -q "ikea-frontend" "$NGINX_CONF"; then
+            ok "IKEA blocks already present in nginx config — skipping patch"
+        else
+            info "Backing up nginx config…"
+            cp "$NGINX_CONF" "${NGINX_CONF}.bak.$(date +%Y%m%d%H%M%S)"
+            ok "Backup saved"
+
+            info "Patching nginx config…"
+            python3 - "$NGINX_CONF" << 'PYEOF'
+import sys, re
+
+path = sys.argv[1]
+with open(path) as f:
+    content = f.read()
+
+UPSTREAMS = """
+    upstream ikea-frontend      { server ikea-frontend:80;         keepalive 16; }
+    upstream ikea-jobs-server   { server ikea-jobs-server:3001;    keepalive 16; }
+    upstream ikea-email-service { server ikea-email-service:3002;  keepalive 16; }
+"""
+
+LOCATIONS = """
+        # ─── IKEA Jobs app ───────────────────────────────────────
+        location /ikea/ {
+            proxy_pass         http://ikea-frontend/;
+            proxy_http_version 1.1;
+            proxy_set_header   Host              $host;
+            proxy_set_header   X-Real-IP         $remote_addr;
+            proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Proto $scheme;
+            add_header         X-Frame-Options   "SAMEORIGIN" always;
+        }
+
+        location /ikea/api/jobs/ {
+            proxy_pass         http://ikea-email-service/;
+            proxy_http_version 1.1;
+            proxy_set_header   Host              $host;
+            proxy_set_header   X-Forwarded-Proto $scheme;
+        }
+
+        location /ikea/api/apply/ {
+            proxy_pass         http://ikea-jobs-server/;
+            proxy_http_version 1.1;
+            proxy_set_header   Host              $host;
+            proxy_set_header   X-Forwarded-Proto $scheme;
+            client_max_body_size 6M;
+        }
+
+"""
+
+# Insert upstreams after last upstream block closing brace
+last_upstream = [m.end() for m in re.finditer(r'upstream\s+\w+\s*\{[^}]*\}', content)]
+if not last_upstream:
+    print("ERROR: no upstream blocks found in nginx.conf", file=sys.stderr)
+    sys.exit(1)
+insert_at = last_upstream[-1]
+content = content[:insert_at] + "\n" + UPSTREAMS + content[insert_at:]
+
+# Insert location blocks before first bare "location /" block
+match = re.search(r'(\n[ \t]+location\s+/\s*\{)', content)
+if not match:
+    print("ERROR: could not find 'location /' in nginx.conf", file=sys.stderr)
+    sys.exit(1)
+insert_at = match.start()
+content = content[:insert_at] + "\n" + LOCATIONS + content[insert_at:]
+
+with open(path, 'w') as f:
+    f.write(content)
+
+print("OK")
+PYEOF
+
+            ok "nginx.conf patched"
+
+            # ── Test config ───────────────────────────────────────────────────
+            info "Testing nginx config…"
+            if docker exec "$NGINX_CONTAINER" nginx -t 2>&1; then
+                ok "nginx config test passed"
+                docker exec "$NGINX_CONTAINER" nginx -s reload
+                ok "nginx reloaded — IKEA app is live"
+            else
+                warn "nginx config test FAILED — restoring backup"
+                cp "${NGINX_CONF}.bak."* "$NGINX_CONF" 2>/dev/null || true
+                die "nginx config invalid. Original restored. Check logs above."
+            fi
+        fi
     fi
 fi
 
