@@ -2,6 +2,7 @@ services:
 
   # ── React frontend served by nginx ───────────────────────────────────────
   frontend:
+    container_name: ikea-frontend
     build:
       context: ./ikea-jobs-page
       args:
@@ -18,6 +19,7 @@ services:
 
   # ── Application / email server (port 3001) ───────────────────────────────
   jobs-server:
+    container_name: ikea-jobs-server
     build: ./ikea-jobs-server
     expose:
       - "3001"
@@ -28,6 +30,7 @@ services:
 
   # ── ADAM cache + job-fetch service (port 3002) ───────────────────────────
   email-service:
+    container_name: ikea-email-service
     build: ./ikea-email-service
     expose:
       - "3002"
