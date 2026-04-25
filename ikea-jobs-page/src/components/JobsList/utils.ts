@@ -150,8 +150,12 @@ export const filterJobs = (
 
     const matchesSearch =
       !search ||
-      job.tat_profession_name?.toLowerCase().includes(search) ||
-      job.description?.toLowerCase().includes(search);
+      job.description?.toLowerCase().includes(search) ||
+      job.name_snif?.toLowerCase().includes(search) ||
+      job.order_def_prof_name1?.toLowerCase().includes(search) ||
+      job.living_area1?.toLowerCase().includes(search) ||
+      job.living_area2?.toLowerCase().includes(search) ||
+      job.tat_profession_name?.toLowerCase().includes(search);
 
     const matchesBranch = selectedBranches.length === 0 || selectedBranches.includes(job.name_snif);
     const matchesProf = selectedProfs.length === 0 || selectedProfs.includes(job.order_def_prof_name1);

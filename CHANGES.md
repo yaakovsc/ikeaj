@@ -81,6 +81,10 @@ It should be updated whenever a new bug fix is applied.
 - Updated `ikea-jobs-server/src/controllers/applicationController.js`: webhook call runs in parallel with ActiveTrail emails; parses `job` field from JSON string.
 - Updated `ikea-jobs-page/src/services/activeTrailService.ts`: frontend now sends `FormData` (instead of JSON) including the CV file.
 
+### Free text search covers all card fields (2026-04-26)
+- Search now matches across all visible card fields: job title, branch, profession, living areas, and profession name.
+- Previously only searched job title and `tat_profession_name`.
+
 ### Scroll to top on page load (2026-04-26)
 - Added `window.scrollTo(0, 0)` on mount in App.tsx so the page always starts at the top on reload.
 
