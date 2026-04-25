@@ -85,3 +85,28 @@ export const clearApplicationData = (): void => {
     console.error('Failed to clear application data:', error);
   }
 };
+
+const APPLIED_JOBS_KEY = 'ikea_applied_jobs';
+
+export const saveAppliedJob = (jobId: number): void => {
+  try {
+    const existing = getAppliedJobs();
+    if (!existing.includes(jobId)) {
+      localStorage.setItem(APPLIED_JOBS_KEY, JSON.stringify([...existing, jobId]));
+    }
+  } catch (error) {
+    console.error('Failed to save applied job:', error);
+  }
+};
+
+export const getAppliedJobs = (): number[] => {
+  try {
+    const stored = localStorage.getItem(APPLIED_JOBS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const hasAppliedToJob = (jobId: number): boolean =>
+  getAppliedJobs().includes(jobId);

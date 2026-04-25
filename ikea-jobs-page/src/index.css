@@ -11,7 +11,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 18px;
   scroll-behavior: smooth;
 }
 
@@ -151,6 +151,10 @@ li {
   outline-offset: 2px;
 }
 
+.filter-trigger:focus-visible {
+  outline: none;
+}
+
 /* הדפסה */
 @media print {
   body {
@@ -171,21 +175,21 @@ li {
 /* תמיכה במכשירים ניידים */
 @media (max-width: 768px) {
   html {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 
 /* תמיכה בטאבלטים */
 @media (min-width: 769px) and (max-width: 1024px) {
   html {
-    font-size: 15px;
+    font-size: 17px;
   }
 }
 
 /* מסכים גדולים */
 @media (min-width: 1920px) {
   html {
-    font-size: 18px;
+    font-size: 20px;
   }
 }
 

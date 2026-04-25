@@ -122,8 +122,8 @@ export const sortJobsByDate = (jobs: Job[]): Job[] => {
  * 
  * @param {Job[]} jobs - Array of jobs to filter
  * @param {string} searchTerm - Text to search for in job titles/descriptions
- * @param {string} selectedBranch - Specific branch/store to filter by
- * @param {string} selectedProf - Specific profession/field to filter by
+ * @param {string[]} selectedBranches - Branches/stores to filter by (empty = all)
+ * @param {string[]} selectedProfs - Professions/fields to filter by (empty = all)
  * @returns {Job[]} Filtered array of jobs matching all criteria
  * 
  * @example
@@ -140,10 +140,12 @@ export const sortJobsByDate = (jobs: Job[]): Job[] => {
 export const filterJobs = (
   jobs: Job[],
   searchTerm: string,
-  selectedBranch: string,
-  selectedProf: string
+  selectedBranches: string[],
+  selectedProfs: string[]
 ): Job[] => {
   return jobs.filter((job) => {
+    if (!job) return false;
+
     const search = searchTerm.toLowerCase().trim();
 
     const matchesSearch =
@@ -151,8 +153,8 @@ export const filterJobs = (
       job.tat_profession_name?.toLowerCase().includes(search) ||
       job.description?.toLowerCase().includes(search);
 
-    const matchesBranch = !selectedBranch || job.name_snif === selectedBranch;
-    const matchesProf = !selectedProf || job.order_def_prof_name1 === selectedProf;
+    const matchesBranch = selectedBranches.length === 0 || selectedBranches.includes(job.name_snif);
+    const matchesProf = selectedProfs.length === 0 || selectedProfs.includes(job.order_def_prof_name1);
 
     return matchesSearch && matchesBranch && matchesProf;
   });
@@ -174,7 +176,13 @@ export const filterJobs = (
  * ```
  */
 export const getUniqueBranches = (jobs: Job[]): string[] => {
-  return Array.from(new Set(jobs.map((j) => j.name_snif))).filter(Boolean);
+  return Array.from(
+    new Set(
+      jobs
+        .map((j) => j?.name_snif)
+        .filter((branch): branch is string => typeof branch === 'string' && branch.trim().length > 0)
+    )
+  );
 };
 
 /**
@@ -193,7 +201,16 @@ export const getUniqueBranches = (jobs: Job[]): string[] => {
  * ```
  */
 export const getUniqueProfessions = (jobs: Job[]): string[] => {
-  return Array.from(new Set(jobs.map((j) => j.order_def_prof_name1))).filter(Boolean);
+  return Array.from(
+    new Set(
+      jobs
+        .map((j) => j?.order_def_prof_name1)
+        .filter(
+          (profession): profession is string =>
+            typeof profession === 'string' && profession.trim().length > 0
+        )
+    )
+  );
 };
 
 /**

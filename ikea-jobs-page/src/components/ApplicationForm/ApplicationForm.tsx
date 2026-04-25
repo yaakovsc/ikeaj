@@ -16,35 +16,13 @@ import {
   ErrorMessage,
 } from './ApplicationForm.styles';
 
-/**
- * Props for ApplicationForm component
- */
 interface ApplicationFormProps {
-  /** Job object containing job details */
   job: Job;
+  onApplied?: () => void;
 }
 
-/**
- * ApplicationForm Component
- * 
- * Renders a form for job application submission with validation,
- * XSS protection, and localStorage support for saving user data.
- * 
- * Features:
- * - Full form validation with Zod
- * - XSS protection with DOMPurify
- * - Auto-save user details to localStorage
- * - File upload support (optional CV)
- * - Accessible with ARIA labels
- * 
- * @component
- * @example
- * ```tsx
- * <ApplicationForm job={jobData} />
- * ```
- */
-const ApplicationForm: React.FC<ApplicationFormProps> = ({ job }) => {
-  const { methods, isSubmitting, success, error, onSubmit } = useApplicationForm(job);
+const ApplicationForm: React.FC<ApplicationFormProps> = ({ job, onApplied }) => {
+  const { methods, isSubmitting, success, error, onSubmit } = useApplicationForm(job, onApplied);
   const { register, handleSubmit, watch, formState: { errors } } = methods;
   
   const cvFile = watch('cvFile');
@@ -56,12 +34,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ job }) => {
   if (success) {
     return (
       <SuccessMessage>
-        <h3>✅ תודה רבה!</h3>
-        <p>
-          המועמדות שלך נשלחה בהצלחה.
-          <br />
-          ניצור איתך קשר בהקדם.
-        </p>
+        <h3>המועמדות נשלחה בהצלחה</h3>
+        <p>תודה רבה. ניצור איתך קשר בהקדם האפשרי.</p>
       </SuccessMessage>
     );
   }

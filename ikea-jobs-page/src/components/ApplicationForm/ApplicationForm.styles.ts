@@ -9,7 +9,7 @@ export const FormContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const FormTitle = styled(Typography)(({ theme }) => ({
-  fontSize: '20px',
+  fontSize: '23px',
   fontWeight: 600,
   marginBottom: theme.spacing(3),
   textAlign: 'right',
@@ -30,7 +30,7 @@ export const FieldWrapper = styled(Box)<{ error?: boolean }>(({ theme, error }) 
   position: 'relative',
   
   '& label': {
-    fontSize: '14px',
+    fontSize: '16px',
     color: error ? theme.palette.error.main : theme.palette.text.secondary,
     display: 'block',
     marginBottom: theme.spacing(0.5),
@@ -39,7 +39,7 @@ export const FieldWrapper = styled(Box)<{ error?: boolean }>(({ theme, error }) 
   
   '& .error': {
     color: theme.palette.error.main,
-    fontSize: '12px',
+    fontSize: '14px',
     marginTop: theme.spacing(0.5),
     display: 'block',
     fontWeight: 400,
@@ -53,7 +53,7 @@ export const StyledInput = styled('input')<{ error?: boolean }>(({ theme, error 
     ? `2px solid ${theme.palette.error.main}` 
     : `1px solid ${theme.palette.text.primary}`,
   padding: theme.spacing(1, 0),
-  fontSize: '16px',
+  fontSize: '18px',
   outline: 'none',
   background: 'transparent',
   color: theme.palette.text.primary,
@@ -75,7 +75,7 @@ export const FileLabel = styled('label')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(1),
-  fontSize: '16px',
+  fontSize: '18px',
   padding: theme.spacing(1, 0),
   borderBottom: `1px solid ${theme.palette.text.primary}`,
   color: theme.palette.text.primary,
@@ -86,49 +86,46 @@ export const FileLabel = styled('label')(({ theme }) => ({
   },
 }));
 
-export const SubmitButton = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  borderRadius: theme.spacing(1),
-  padding: theme.spacing(1.25, 5),
+export const SubmitButton = styled(Button)({
+  backgroundColor: '#000',
+  color: '#fff',
+  borderRadius: 24,
+  padding: '10px 40px',
   fontSize: '18px',
   fontWeight: 600,
   textTransform: 'none',
   boxShadow: 'none',
-  transition: 'all 0.2s ease-in-out',
-  
+  transition: 'background 0.2s',
   '&:hover': {
-    backgroundColor: theme.palette.primary.dark,
-    boxShadow: theme.shadows[2],
+    backgroundColor: '#333',
+    boxShadow: 'none',
   },
-  
   '&:disabled': {
-    backgroundColor: theme.palette.action.disabledBackground,
-    color: theme.palette.action.disabled,
+    backgroundColor: '#999',
+    color: '#fff',
   },
-}));
+});
 
-export const SuccessMessage = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.success.light,
-  border: `1px solid ${theme.palette.success.main}`,
-  borderRadius: theme.spacing(1),
-  padding: theme.spacing(2.5),
-  textAlign: 'center',
-  color: theme.palette.success.dark,
-  marginBottom: theme.spacing(2.5),
-  
+export const SuccessMessage = styled(Box)({
+  backgroundColor: '#f0faf4',
+  borderRight: '3px solid #2e7d32',
+  padding: '20px 24px',
+  marginBottom: 20,
+  direction: 'rtl',
+  textAlign: 'right',
   '& h3': {
-    margin: theme.spacing(0, 0, 1.25, 0),
-    fontSize: '22px',
-    fontWeight: 600,
+    margin: '0 0 6px',
+    fontSize: '20px',
+    fontWeight: 700,
+    color: '#1b5e20',
   },
-  
   '& p': {
     margin: 0,
     fontSize: '16px',
+    color: '#555',
     lineHeight: 1.6,
   },
-}));
+});
 
 export const ErrorMessage = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.error.light,

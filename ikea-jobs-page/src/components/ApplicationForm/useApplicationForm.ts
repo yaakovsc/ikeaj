@@ -6,7 +6,7 @@ import { sendJobApplication } from '../../services/activeTrailService';
 import { applicationSchema, ApplicationFormData } from './schema';
 import { extractErrorMessage } from './utils';
 import { ERROR_MESSAGES } from './constants';
-import { saveApplicationData, loadApplicationData } from './storage';
+import { saveApplicationData, loadApplicationData, saveAppliedJob } from './storage';
 //use the email service instead of active trail for sending applications
 import { sendJobApplicationEmail } from '../../services/emailService.client';
 /**
@@ -45,7 +45,7 @@ interface UseApplicationFormReturn {
  * const { methods, isSubmitting, success, error, onSubmit } = useApplicationForm(job);
  * ```
  */
-export const useApplicationForm = (job: Job): UseApplicationFormReturn => {
+export const useApplicationForm = (job: Job, onApplied?: () => void): UseApplicationFormReturn => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,9 +91,9 @@ export const useApplicationForm = (job: Job): UseApplicationFormReturn => {
 
         if (result.success) {
           setSuccess(true);
-          // Don't reset form - keep the data for next application
-          // Only clear the file input
           methods.setValue('cvFile', undefined);
+          saveAppliedJob(job.order_id);
+          onApplied?.();
         } else {
           const errorMsg = extractErrorMessage(result.error, ERROR_MESSAGES.SUBMISSION_ERROR);
           setError(errorMsg);

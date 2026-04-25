@@ -1,139 +1,170 @@
 import React from 'react';
-import { MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
 import JobItem from '../JobItem';
+import FilterDropdown from './FilterDropdown';
 import { useJobsList } from './useJobsList';
 import { LABELS } from './constants';
 import { generateJobKey } from './utils';
 import {
-  PageContainer,
+  PageWrapper,
+  StickyHeader,
+  TopRibbon,
+  RibbonText,
+  MainHeaderRow,
+  HeaderSearchWrapper,
+  HeaderSearchInput,
+  HeaderSearchIcon,
+  PageTitleBar,
   PageTitle,
-  FiltersContainer,
-  SearchTextField,
-  FilterSelect,
+  BannerWrapper,
+  ContentArea,
+  FilterSidebar,
+  FilterLabel,
   SearchButton,
-  ClearButton,
+  ClearLink,
+  ChipsRow,
+  FilterChip,
+  JobsArea,
   ResultsCount,
-  JobsContainer,
+  JobsGrid,
   NoResults,
+  SkeletonCard,
 } from './JobsList.styles';
 
-/**
- * JobsList Component - Main page displaying all available job postings with filtering
- * 
- * Features:
- * - Text search across job titles and descriptions
- * - Filter by branch/store location
- * - Filter by profession/field
- * - Real-time results count
- * - Accessibility support (ARIA labels, keyboard navigation)
- * - Optimized with React.memo to prevent unnecessary re-renders
- * 
- * @component
- * @example
- * ```tsx
- * // Main jobs page - no props needed
- * <JobsList />
- * ```
- */
 const JobsList: React.FC = () => {
   const {
     filteredJobs,
     searchTerm,
-    selectedBranch,
-    selectedProf,
+    selectedBranches,
+    selectedProfs,
     branches,
     professions,
+    isLoading,
     setSearchTerm,
-    setSelectedBranch,
-    setSelectedProf,
+    setSelectedBranches,
+    setSelectedProfs,
     handleSearch,
     handleClearFilters,
   } = useJobsList();
 
+  const hasActiveFilters = selectedBranches.length > 0 || selectedProfs.length > 0 || searchTerm.trim().length > 0;
+
+  const removeChip = (type: 'branch' | 'prof', value: string) => {
+    if (type === 'branch') setSelectedBranches(selectedBranches.filter(b => b !== value));
+    else setSelectedProfs(selectedProfs.filter(p => p !== value));
+  };
+
   return (
-    <PageContainer maxWidth="lg">
-      <PageTitle variant="h3">{LABELS.PAGE_TITLE}</PageTitle>
+    <PageWrapper>
+      {/* ── Header ── */}
+      <StickyHeader>
+        <TopRibbon>
+          <RibbonText>IKEA Israel | משרות פנויות</RibbonText>
+        </TopRibbon>
 
-      <FiltersContainer>
-        <SearchTextField
-          placeholder={LABELS.SEARCH_PLACEHOLDER}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-          variant="outlined"
-          size="small"
-          aria-label={LABELS.SEARCH_PLACEHOLDER}
+        <MainHeaderRow>
+          <img
+            src="/ikea-logo.png"
+            alt="IKEA"
+            style={{ height: 52, width: 'auto', flexShrink: 0, cursor: 'pointer' }}
+          />
+
+          <HeaderSearchWrapper>
+            <HeaderSearchInput
+              placeholder={LABELS.SEARCH_PLACEHOLDER}
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              aria-label={LABELS.SEARCH_PLACEHOLDER}
+            />
+            <HeaderSearchIcon onClick={handleSearch} aria-label="חפש">
+              <SearchIcon style={{ fontSize: 20 }} />
+            </HeaderSearchIcon>
+          </HeaderSearchWrapper>
+        </MainHeaderRow>
+      </StickyHeader>
+
+      {/* ── Page title ── */}
+      <PageTitleBar>
+        <PageTitle variant="h1">{LABELS.PAGE_TITLE}</PageTitle>
+      </PageTitleBar>
+
+      {/* ── Banner ── */}
+      <BannerWrapper>
+        <img
+          src="/banner.avif"
+          alt="IKEA Jobs Banner"
+          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
+      </BannerWrapper>
 
-        <FilterSelect
-          value={selectedBranch}
-          onChange={(e) => setSelectedBranch(e.target.value as string)}
-          displayEmpty
-          size="small"
-          aria-label="בחירת חנות"
-        >
-          <MenuItem value="">{LABELS.ALL_STORES}</MenuItem>
-          {branches.map((b) => (
-            <MenuItem key={b} value={b}>
-              {b}
-            </MenuItem>
-          ))}
-        </FilterSelect>
+      {/* ── Main content ── */}
+      <ContentArea>
+        {/* ── Filter sidebar (RTL = appears on right) ── */}
+        <FilterSidebar>
+          <FilterLabel>{LABELS.FILTER_TITLE}</FilterLabel>
 
-        <FilterSelect
-          value={selectedProf}
-          onChange={(e) => setSelectedProf(e.target.value as string)}
-          displayEmpty
-          size="small"
-          aria-label="בחירת תחום"
-        >
-          <MenuItem value="">{LABELS.ALL_FIELDS}</MenuItem>
-          {professions.map((p) => (
-            <MenuItem key={p} value={p}>
-              {p}
-            </MenuItem>
-          ))}
-        </FilterSelect>
+          <FilterDropdown
+            label={LABELS.STORE_FILTER}
+            options={branches}
+            selected={selectedBranches}
+            onChange={setSelectedBranches}
+          />
 
-        <SearchButton
-          variant="contained"
-          color="primary"
-          onClick={handleSearch}
-          startIcon={<SearchIcon />}
-          aria-label={LABELS.SEARCH_BUTTON}
-        >
-          {LABELS.SEARCH_BUTTON}
-        </SearchButton>
+          <FilterDropdown
+            label={LABELS.DOMAIN_FILTER}
+            options={professions}
+            selected={selectedProfs}
+            onChange={setSelectedProfs}
+          />
 
-        <ClearButton
-          variant="contained"
-          color="error"
-          onClick={handleClearFilters}
-          startIcon={<ClearIcon />}
-          aria-label={LABELS.CLEAR_BUTTON}
-        >
-          {LABELS.CLEAR_BUTTON}
-        </ClearButton>
-      </FiltersContainer>
+          <SearchButton variant="contained" onClick={handleSearch} disableElevation>
+            {LABELS.SEARCH_BUTTON}
+          </SearchButton>
 
-      <ResultsCount variant="body1" role="status" aria-live="polite">
-        {LABELS.RESULTS_COUNT} {filteredJobs.length} {LABELS.RESULTS_SUFFIX}
-      </ResultsCount>
+          {hasActiveFilters && (
+            <ClearLink onClick={handleClearFilters}>{LABELS.CLEAR_BUTTON}</ClearLink>
+          )}
+        </FilterSidebar>
 
-      <JobsContainer>
-        {filteredJobs.length > 0 ? (
-          filteredJobs.map((job, index) => (
-            <JobItem key={generateJobKey(job, index)} job={job} />
-          ))
-        ) : (
-          <NoResults variant="h6" role="alert">
-            {LABELS.NO_RESULTS}
-          </NoResults>
-        )}
-      </JobsContainer>
-    </PageContainer>
+        {/* ── Jobs area (RTL = appears on left) ── */}
+        <JobsArea>
+          {/* Active filter chips */}
+          {(selectedBranches.length > 0 || selectedProfs.length > 0) && (
+            <ChipsRow>
+              {selectedBranches.map(b => (
+                <FilterChip key={b}>
+                  <span>{b}</span>
+                  <button onClick={() => removeChip('branch', b)} aria-label={`הסר ${b}`}>×</button>
+                </FilterChip>
+              ))}
+              {selectedProfs.map(p => (
+                <FilterChip key={p}>
+                  <span>{p}</span>
+                  <button onClick={() => removeChip('prof', p)} aria-label={`הסר ${p}`}>×</button>
+                </FilterChip>
+              ))}
+            </ChipsRow>
+          )}
+
+          <ResultsCount role="status" aria-live="polite">
+            {isLoading ? LABELS.LOADING : `${LABELS.RESULTS_COUNT} ${filteredJobs.length} ${LABELS.RESULTS_SUFFIX}`}
+          </ResultsCount>
+
+          <JobsGrid>
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+            ) : filteredJobs.length > 0 ? (
+              filteredJobs.map((job, index) => (
+                <JobItem key={generateJobKey(job, index)} job={job} />
+              ))
+            ) : (
+              <NoResults role="alert">{LABELS.NO_RESULTS}</NoResults>
+            )}
+          </JobsGrid>
+        </JobsArea>
+      </ContentArea>
+    </PageWrapper>
   );
 };
 

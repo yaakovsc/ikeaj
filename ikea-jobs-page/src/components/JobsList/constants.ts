@@ -17,15 +17,19 @@
  * - Empty state message
  */
 export const LABELS = {
-  PAGE_TITLE: 'לוח משרות',
-  SEARCH_PLACEHOLDER: 'חיפוש חופשי...',
+  PAGE_TITLE: 'חיפוש משרות',
+  SEARCH_PLACEHOLDER: 'מה לחפש לך?',
+  FILTER_TITLE: 'סינון משרות',
+  STORE_FILTER: 'בחרו חנות',
+  DOMAIN_FILTER: 'בחרו תחום מקצועי',
   ALL_STORES: 'כל החנויות',
   ALL_FIELDS: 'כל התחומים',
   SEARCH_BUTTON: 'חיפוש',
-  CLEAR_BUTTON: 'נקה הגדרות',
+  CLEAR_BUTTON: 'נקה סינון',
   RESULTS_COUNT: 'נמצאו',
   RESULTS_SUFFIX: 'משרות',
   NO_RESULTS: 'לא נמצאו משרות העונות על החיפוש.',
+  LOADING: 'טוען משרות...',
 } as const;
 
 /**

@@ -62,15 +62,20 @@ export const sendJobApplication = async (
   applicationData: ApplicationData
 ): Promise<SendApplicationResult> => {
   try {
+    const form = new FormData();
+    form.append('fullName', applicationData.fullName);
+    form.append('email',    applicationData.email);
+    form.append('phone',    applicationData.phone);
+    form.append('job',      JSON.stringify(job));
+
+    const cvFile = applicationData.cvFile?.[0];
+    if (cvFile) {
+      form.append('cvFile', cvFile, cvFile.name);
+    }
+
     const response = await fetch('http://localhost:3001/api/send-application', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        job,
-        fullName: applicationData.fullName,
-        email: applicationData.email,
-        phone: applicationData.phone,
-      }),
+      body: form,
     });
 
     if (!response.ok) {

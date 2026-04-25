@@ -1,54 +1,24 @@
-const { sendActiveTrailEmail } = require('../services/activeTrailService');
+const { sendCandidateEmail, sendRecruiterEmail } = require('../services/mailer');
 
-/**
- * Handles job application submissions by sending notification emails via ActiveTrail
- * 
- * This controller:
- * - Receives application data from the frontend
- * - Sends two emails in parallel via ActiveTrail:
- *   1. Confirmation email to the candidate
- *   2. Notification email to the recruiter
- * - Returns success/error response to the client
- * 
- * Expected request body:
- * - fullName: Applicant's full name
- * - email: Applicant's email address
- * - phone: Applicant's phone number
- * - job: Job object with description field
- * 
- * @async
- * @function handleApplication
- * @param {Object} req - Express request object with application data in body
- * @param {Object} res - Express response object
- * @returns {Promise<void>} Sends JSON response with success status
- * 
- * @example
- * // POST /api/send-application
- * // Request body:
- * {
- *   "fullName": "ישראל ישראלי",
- *   "email": "israel@example.com",
- *   "phone": "050-1234567",
- *   "job": { "description": "מנהל/ת סניף" }
- * }
- * 
- * // Success response: { success: true, message: 'Emails sent successfully' }
- * // Error response: { success: false, error: 'Failed to send emails' }
- */
 const handleApplication = async (req, res) => {
     try {
-        const { fullName, email, phone, job } = req.body;
-        const jobTitle = job?.description || "משרה כללית";
+        const { fullName, email, phone } = req.body;
+        const job = typeof req.body.job === 'string'
+            ? JSON.parse(req.body.job)
+            : req.body.job || {};
 
-        // שליחה מקבילה של שני המיילים דרך ActiveTrail בלבד
+        const jobTitle  = job.description          || 'משרה כללית';
+        const jobBranch = job.name_snif            || '';
+        const jobDomain = job.order_def_prof_name1 || '';
+
         await Promise.all([
-            sendActiveTrailEmail({ fullName, email, phone, jobTitle }, false), // לרכז גיוס
-            sendActiveTrailEmail({ fullName, email, phone, jobTitle }, true)    // למועמד
+            sendCandidateEmail({ fullName, email, phone, jobTitle, jobBranch }),
+            sendRecruiterEmail({ fullName, email, phone, jobTitle, jobBranch, jobDomain }, req.file || null),
         ]);
 
         res.status(200).json({ success: true, message: 'Emails sent successfully' });
     } catch (error) {
-        console.error('Email Error:', error);
+        console.error('Application Error:', error);
         res.status(500).json({ success: false, error: 'Failed to send emails' });
     }
 };
