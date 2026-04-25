@@ -56,6 +56,12 @@ read -rs _input; echo; ADAM_API_TOKEN="${_input:-PENDING}"
 ok "  ADAM_API_TOKEN=*** (set)"
 
 echo
+if command -v docker &>/dev/null && docker ps &>/dev/null; then
+    echo -e "${CYAN}  Running Docker containers:${NC}"
+    docker ps --format "  • {{.Names}}\t({{.Image}})" | grep -i nginx || \
+    docker ps --format "  • {{.Names}}\t({{.Image}})"
+    echo
+fi
 ask "Name of your existing nginx Docker container (press Enter to skip if none):"
 read -r NGINX_CONTAINER
 
