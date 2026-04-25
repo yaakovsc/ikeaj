@@ -81,6 +81,9 @@ It should be updated whenever a new bug fix is applied.
 - Updated `ikea-jobs-server/src/controllers/applicationController.js`: webhook call runs in parallel with ActiveTrail emails; parses `job` field from JSON string.
 - Updated `ikea-jobs-page/src/services/activeTrailService.ts`: frontend now sends `FormData` (instead of JSON) including the CV file.
 
+### install.sh — open outbound SMTP port 587 in firewall (2026-04-25)
+- Added `ufw allow out 587/tcp` in Step 2 so Gmail email delivery works out of the box.
+
 ### Switch Gmail SMTP from port 465 to 587 (2026-04-25)
 - Changed mailer.js transporter from `service: 'gmail'` to explicit host/port config using port 587 (STARTTLS).
 - Port 465 was blocked by the VPS provider; port 587 is open.

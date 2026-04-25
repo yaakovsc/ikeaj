@@ -91,6 +91,13 @@ apt_install git
 apt_install ca-certificates
 apt_install gnupg
 apt_install lsb-release
+apt_install ufw
+
+# Allow outbound SMTP (port 587) for Gmail email delivery
+if command -v ufw &>/dev/null; then
+    ufw allow out 587/tcp &>/dev/null || true
+    ok "Outbound SMTP (port 587) allowed in firewall"
+fi
 
 # ── Docker ───────────────────────────────────────────────────────────────────
 if command -v docker &>/dev/null; then
