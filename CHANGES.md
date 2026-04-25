@@ -81,6 +81,9 @@ It should be updated whenever a new bug fix is applied.
 - Updated `ikea-jobs-server/src/controllers/applicationController.js`: webhook call runs in parallel with ActiveTrail emails; parses `job` field from JSON string.
 - Updated `ikea-jobs-page/src/services/activeTrailService.ts`: frontend now sends `FormData` (instead of JSON) including the CV file.
 
+### Scroll to top on page load (2026-04-26)
+- Added `window.scrollTo(0, 0)` on mount in App.tsx so the page always starts at the top on reload.
+
 ### Fix Hebrew filename gibberish in recruiter email attachment (2026-04-26)
 - multer decodes uploaded filenames as Latin-1 by default, corrupting Hebrew UTF-8 characters.
 - Fixed by re-encoding `cvFile.originalname` with `Buffer.from(..., 'latin1').toString('utf8')` before passing to Nodemailer.
