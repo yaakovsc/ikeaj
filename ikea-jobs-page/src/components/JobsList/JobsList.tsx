@@ -65,7 +65,7 @@ const JobsList: React.FC = () => {
 
         <MainHeaderRow>
           <img
-            src="/ikea-logo.png"
+            src={`${process.env.PUBLIC_URL}/ikea-logo.png`}
             alt="IKEA"
             style={{ height: 52, width: 'auto', flexShrink: 0, cursor: 'pointer' }}
           />
@@ -93,7 +93,7 @@ const JobsList: React.FC = () => {
       {/* ── Banner ── */}
       <BannerWrapper>
         <img
-          src="/banner.avif"
+          src={`${process.env.PUBLIC_URL}/banner.avif`}
           alt="IKEA Jobs Banner"
           onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
