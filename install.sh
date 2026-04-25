@@ -290,6 +290,23 @@ if [[ -n "$NGINX_CONTAINER" ]]; then
 fi
 
 # =============================================================================
+#  STEP 9 — Seed test job data
+# =============================================================================
+hdr "STEP 9 — Test job data"
+
+ask "Inject test job data into the database? Useful if ADAM is not yet connected. [y/N]:"
+read -r SEED_DATA
+if [[ "${SEED_DATA,,}" == "y" ]]; then
+    ask "How many test jobs to generate? [15]:"
+    read -r _input; SEED_COUNT="${_input:-15}"
+    info "Running seed script ($SEED_COUNT jobs)…"
+    docker compose exec -T email-service node seed-jobs.js "$SEED_COUNT"
+    ok "$SEED_COUNT test jobs injected — restart not needed"
+else
+    info "Skipped seed — app will fetch live jobs from ADAM"
+fi
+
+# =============================================================================
 #  Summary
 # =============================================================================
 hdr "Installation complete"

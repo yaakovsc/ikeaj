@@ -82,16 +82,19 @@ async function getJobsWithCache() {
     const localData = readLocalData();
 
     if (!localData) {
-      return await adamGetDataFromApi();
+      const jobs = await adamGetDataFromApi();
+      return jobs ? { jobs, source: 'live' } : null;
     }
 
     if (!lastFetch || (now - lastFetch) / 60000 > config.refreshMinutes) {
       console.log("Refreshing from API...");
-      const data = await adamGetDataFromApi();
-      if (data) return data;
+      const jobs = await adamGetDataFromApi();
+      if (jobs) return { jobs, source: 'live' };
+      // ADAM unreachable — fall back to local cache
+      console.warn("ADAM unavailable — serving local cache");
     }
 
-    return localData;
+    return { jobs: localData, source: 'cache' };
   } catch (err) {
     console.error("cache error:", err);
     return null;

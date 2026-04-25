@@ -40,6 +40,7 @@ const JobsList: React.FC = () => {
     branches,
     professions,
     isLoading,
+    isFromCache,
     setSearchTerm,
     setSelectedBranches,
     setSelectedProfs,
@@ -97,6 +98,24 @@ const JobsList: React.FC = () => {
           onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
       </BannerWrapper>
+
+      {/* ── Cache warning ── */}
+      {isFromCache && (
+        <div style={{
+          background: '#fff8e1',
+          borderBottom: '2px solid #f9a825',
+          padding: '10px 24px',
+          direction: 'rtl',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          fontSize: 15,
+          color: '#5d4037',
+        }}>
+          <span style={{ fontSize: 18 }}>⚠️</span>
+          <span>מסד נתונים מקומי — ADAM לא זמין. המשרות המוצגות עשויות לא לשקף את המצב הנוכחי.</span>
+        </div>
+      )}
 
       {/* ── Main content ── */}
       <ContentArea>

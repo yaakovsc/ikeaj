@@ -34,6 +34,7 @@ interface UseJobsListReturn {
   branches: string[];
   professions: string[];
   isLoading: boolean;
+  isFromCache: boolean;
   setSearchTerm: (value: string) => void;
   setSelectedBranches: (values: string[]) => void;
   setSelectedProfs: (values: string[]) => void;
@@ -47,25 +48,31 @@ export const useJobsList = (): UseJobsListReturn => {
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
   const [selectedProfs, setSelectedProfs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFromCache, setIsFromCache] = useState(false);
 
-  const fetchJobs = useCallback(async (): Promise<Job[]> => {
+  const fetchJobs = useCallback(async (): Promise<{ jobs: Job[]; source: string }> => {
     try {
       const response = await fetch(`${process.env.REACT_APP_EMAIL_SERVICE_URL || 'http://localhost:3002'}/api/fetch-jobs`);
       if (!response.ok) throw new Error(`Failed to fetch jobs: ${response.status}`);
       const data: unknown = await response.json();
-      return normalizeJobsData(data);
+      const parsed = data as { jobs?: unknown; source?: string };
+      return {
+        jobs: normalizeJobsData(parsed.jobs ?? data),
+        source: parsed.source ?? 'live',
+      };
     } catch (err) {
       console.error("Error fetching jobs:", err);
-      return [];
+      return { jobs: [], source: 'live' };
     }
   }, []);
 
   useEffect(() => {
     const getData = async () => {
       setIsLoading(true);
-      const data = await fetchJobs();
-      const sorted = sortJobsByDate(data);
+      const { jobs, source } = await fetchJobs();
+      const sorted = sortJobsByDate(jobs);
       setAllJobs(sorted);
+      setIsFromCache(source === 'cache');
       setIsLoading(false);
     };
     getData();
@@ -98,6 +105,7 @@ export const useJobsList = (): UseJobsListReturn => {
     branches,
     professions,
     isLoading,
+    isFromCache,
     setSearchTerm,
     setSelectedBranches,
     setSelectedProfs,

@@ -33,11 +33,10 @@ const upload = multer({
 router.post("/send-application", upload.single("cvFile"), handleApplication);
 
 router.get("/fetch-jobs", async (req, res) => {
-  const data = await getJobsWithCache();
-  if (!data) return res.status(500).send("failed");
+  const result = await getJobsWithCache();
+  if (!result) return res.status(500).json({ error: "failed to load jobs" });
 
-  res.setHeader("Content-Type", "application/json");
-  res.send(data);
+  res.json({ jobs: result.jobs, source: result.source });
 });
 
 module.exports = router;
