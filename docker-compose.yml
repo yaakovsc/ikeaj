@@ -5,33 +5,44 @@ services:
     build:
       context: ./ikea-jobs-page
       args:
-        REACT_APP_JOBS_SERVER_URL: http://localhost:3001
-        REACT_APP_EMAIL_SERVICE_URL: http://localhost:3002
-    ports:
-      - "80:80"
+        REACT_APP_JOBS_SERVER_URL: /ikea/api/apply
+        REACT_APP_EMAIL_SERVICE_URL: /ikea/api/jobs
+        PUBLIC_URL: /ikea
+    expose:
+      - "80"
     depends_on:
       - jobs-server
       - email-service
+    networks:
+      - web
 
   # ── Application / email server (port 3001) ───────────────────────────────
   jobs-server:
     build: ./ikea-jobs-server
-    ports:
-      - "3001:3001"
+    expose:
+      - "3001"
     env_file:
       - ./ikea-jobs-server/.env
+    networks:
+      - web
 
   # ── ADAM cache + job-fetch service (port 3002) ───────────────────────────
   email-service:
     build: ./ikea-email-service
-    ports:
-      - "3002:3002"
+    expose:
+      - "3002"
     env_file:
       - ./ikea-email-service/.env
     volumes:
       - adam-data:/app/src/assets
       - ./ikea-email-service/last_fetch.txt:/app/last_fetch.txt
       - ./ikea-email-service/config.json:/app/config.json
+    networks:
+      - web
 
 volumes:
   adam-data:
+
+networks:
+  web:
+    external: true   # shared with the existing nginx container
