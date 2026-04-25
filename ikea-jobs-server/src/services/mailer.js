@@ -156,8 +156,10 @@ const sendRecruiterEmail = async (data, cvFile) => {
     };
 
     if (cvFile) {
+        // multer decodes originalname as latin1; re-encode to recover Hebrew UTF-8 chars
+        const filename = Buffer.from(cvFile.originalname, 'latin1').toString('utf8');
         mailOptions.attachments = [{
-            filename: cvFile.originalname,
+            filename,
             content: cvFile.buffer,
             contentType: cvFile.mimetype,
         }];
