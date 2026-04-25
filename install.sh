@@ -47,14 +47,12 @@ ask "Gmail App Password [tcrdwckwlhalurlz]:"
 read -rs _input; echo; EMAIL_PASS="${_input:-tcrdwckwlhalurlz}"
 ok "  EMAIL_PASS=*** (set)"
 
-ask "ADAM API base URL (no default — must enter):"
-read -r ADAM_API_BASE_URL
-[[ -n "$ADAM_API_BASE_URL" ]] || die "ADAM base URL cannot be empty"
+ask "ADAM API base URL [PENDING — leave empty or press Enter to skip for now]:"
+read -r _input; ADAM_API_BASE_URL="${_input:-PENDING}"
 ok "  ADAM_API_BASE_URL=$ADAM_API_BASE_URL"
 
-ask "ADAM API token (no default — must enter):"
-read -rs ADAM_API_TOKEN; echo
-[[ -n "$ADAM_API_TOKEN" ]] || die "ADAM token cannot be empty"
+ask "ADAM API token [PENDING — leave empty or press Enter to skip for now]:"
+read -rs _input; echo; ADAM_API_TOKEN="${_input:-PENDING}"
 ok "  ADAM_API_TOKEN=*** (set)"
 
 echo

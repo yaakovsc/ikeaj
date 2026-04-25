@@ -8,30 +8,34 @@ const CONFIG_FILE = path.join(__dirname, "../../config.json");
 const BASE_URL = process.env.ADAM_API_BASE_URL;
 const token = process.env.ADAM_API_TOKEN;
 
+// TODO: Reading jobs from ADAM — will be enabled once ADAM_API_BASE_URL and
+// ADAM_API_TOKEN are provided by IKEA IT. Until then, always returns null so
+// the system falls back to the local JSON cache.
 async function adamGetDataFromApi() {
+  console.log("ADAM integration pending — skipping live fetch, using local cache");
+  return null;
+
+  /* --- enable when ADAM credentials are available ---
   try {
     const url = `${BASE_URL}Career/GetOrdersDetails`;
-
     const response = await axios.post(
       url,
       { token },
       { headers: { "Content-Type": "application/json" } },
     );
-    let data = response.data;
-
+    const data = response.data;
     if (!Array.isArray(data)) {
       console.error("הנתונים שחזרו מאדם לא תקינים", data);
       return null;
     }
-
     fs.writeFileSync(JSON_FILE, JSON.stringify(data, null, 2), "utf8");
     fs.writeFileSync(LAST_FETCH_FILE, new Date().toISOString());
-
     return data;
   } catch (error) {
     console.error("adam error:", error.message);
     return null;
   }
+  --- */
 }
 
 function readConfig() {
@@ -101,35 +105,37 @@ async function getJobsWithCache() {
   }
 }
 
+// TODO: Sending application to ADAM — will be enabled once ADAM_API_BASE_URL
+// and ADAM_API_TOKEN are provided and the candidate payload structure is confirmed
+// with IKEA IT. Until then, applications are delivered by email only (mailer.js).
 async function AddCandidateWithFiles(candidateDetails) {
-  const url = `${BASE_URL}Candidate/AddCandidateWithFiles`;
-  console.log("candidateDetails", candidateDetails);
+  console.log("ADAM integration pending — application not forwarded to ADAM", candidateDetails);
+  return null;
 
+  /* --- enable when ADAM credentials and payload spec are available ---
+  const url = `${BASE_URL}Candidate/AddCandidateWithFiles`;
   try {
     const response = await axios.post(
       url,
       {
-        token: token,
-        phones: ["0501234567"],
+        token,
+        phones: [candidateDetails.phone],
         candidateDetails: {
-          first_name: "Sara",
-          last_name: "Test",
-          phone1: "0501234567",
-          Email: "test@test.com",
+          first_name: candidateDetails.firstName,
+          last_name:  candidateDetails.lastName,
+          phone1:     candidateDetails.phone,
+          Email:      candidateDetails.email,
         },
         ReplaceCandDetails: true,
       },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
+      { headers: { "Content-Type": "application/json" } },
     );
-
     return response.data;
   } catch (error) {
-    console.error("ERROR:", error.response?.data || error.message);
+    console.error("ADAM AddCandidateWithFiles error:", error.response?.data || error.message);
+    return null;
   }
+  --- */
 }
 
 module.exports = {
