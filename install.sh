@@ -35,25 +35,27 @@ ok "Running as root"
 # =============================================================================
 hdr "STEP 1 — Configuration"
 
-ask "Recruiter email address (applications will be sent here):"
-read -r RECIPIENT_EMAIL
-[[ -n "$RECIPIENT_EMAIL" ]] || die "Recruiter email cannot be empty"
+ask "Recruiter email address [yaakovsc@gmail.com]:"
+read -r _input; RECIPIENT_EMAIL="${_input:-yaakovsc@gmail.com}"
+ok "  RECIPIENT_EMAIL=$RECIPIENT_EMAIL"
 
-ask "Gmail sender address (e.g. mailermechanism@gmail.com):"
-read -r EMAIL_USER
-[[ -n "$EMAIL_USER" ]] || die "Sender email cannot be empty"
+ask "Gmail sender address [mailermechanism@gmail.com]:"
+read -r _input; EMAIL_USER="${_input:-mailermechanism@gmail.com}"
+ok "  EMAIL_USER=$EMAIL_USER"
 
-ask "Gmail App Password for $EMAIL_USER:"
-read -rs EMAIL_PASS; echo
-[[ -n "$EMAIL_PASS" ]] || die "Gmail password cannot be empty"
+ask "Gmail App Password [tcrdwckwlhalurlz]:"
+read -rs _input; echo; EMAIL_PASS="${_input:-tcrdwckwlhalurlz}"
+ok "  EMAIL_PASS=*** (set)"
 
-ask "ADAM API base URL (e.g. https://adam.example.com/api/):"
+ask "ADAM API base URL (no default — must enter):"
 read -r ADAM_API_BASE_URL
 [[ -n "$ADAM_API_BASE_URL" ]] || die "ADAM base URL cannot be empty"
+ok "  ADAM_API_BASE_URL=$ADAM_API_BASE_URL"
 
-ask "ADAM API token:"
+ask "ADAM API token (no default — must enter):"
 read -rs ADAM_API_TOKEN; echo
 [[ -n "$ADAM_API_TOKEN" ]] || die "ADAM token cannot be empty"
+ok "  ADAM_API_TOKEN=*** (set)"
 
 echo
 ask "Name of your existing nginx Docker container (press Enter to skip if none):"
