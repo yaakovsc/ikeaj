@@ -81,6 +81,15 @@ It should be updated whenever a new bug fix is applied.
 - Updated `ikea-jobs-server/src/controllers/applicationController.js`: webhook call runs in parallel with ActiveTrail emails; parses `job` field from JSON string.
 - Updated `ikea-jobs-page/src/services/activeTrailService.ts`: frontend now sends `FormData` (instead of JSON) including the CV file.
 
+### install.sh — automated server installation script (2026-04-25)
+- Added `install.sh`: full Ubuntu 24 installation from scratch.
+- Prompts for all credentials (recruiter email, Gmail, ADAM API).
+- Installs Docker + Compose if missing, clones repo, writes .env files.
+- Creates Docker network, connects existing nginx container.
+- Builds and starts all containers, runs health checks on each service.
+- Prints nginx location blocks and optionally reloads nginx.
+- Prints summary with management commands.
+
 ### Containerization — Docker setup (2026-04-25)
 - Added `Dockerfile` for each service: `ikea-jobs-page` (nginx multi-stage), `ikea-jobs-server`, `ikea-email-service`.
 - Added `docker-compose.yml` at repo root — one command starts all three services.
