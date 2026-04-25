@@ -81,6 +81,15 @@ It should be updated whenever a new bug fix is applied.
 - Updated `ikea-jobs-server/src/controllers/applicationController.js`: webhook call runs in parallel with ActiveTrail emails; parses `job` field from JSON string.
 - Updated `ikea-jobs-page/src/services/activeTrailService.ts`: frontend now sends `FormData` (instead of JSON) including the CV file.
 
+### Containerization — Docker setup (2026-04-25)
+- Added `Dockerfile` for each service: `ikea-jobs-page` (nginx multi-stage), `ikea-jobs-server`, `ikea-email-service`.
+- Added `docker-compose.yml` at repo root — one command starts all three services.
+- Added `.dockerignore` to all three services (excludes `node_modules`, `.env`, `build`).
+- Added `ikea-jobs-page/nginx.conf` for SPA routing (React Router fallback).
+- Replaced hardcoded `localhost` URLs with `REACT_APP_JOBS_SERVER_URL` / `REACT_APP_EMAIL_SERVICE_URL` env vars.
+- Renamed `activeTrailService.ts` → `applicationService.ts` (name was stale after ActiveTrail removal).
+- Updated import in `useApplicationForm.ts` and removed unused `sendJobApplicationEmail` import.
+
 ### Removed Make.com webhook (2026-04-24)
 - Removed `sendToMakeWebhook` function and its `Promise.all` call from `applicationController.js`.
 - Removed unused `form-data` and `node-fetch` imports from the controller.

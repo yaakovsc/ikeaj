@@ -2,13 +2,11 @@ import { useState, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Job } from '../../types';
-import { sendJobApplication } from '../../services/activeTrailService';
+import { sendJobApplication } from '../../services/applicationService';
 import { applicationSchema, ApplicationFormData } from './schema';
 import { extractErrorMessage } from './utils';
 import { ERROR_MESSAGES } from './constants';
 import { saveApplicationData, loadApplicationData, saveAppliedJob } from './storage';
-//use the email service instead of active trail for sending applications
-import { sendJobApplicationEmail } from '../../services/emailService.client';
 /**
  * Return type for useApplicationForm hook
  */
