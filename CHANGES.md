@@ -165,6 +165,12 @@ It should be updated whenever a new bug fix is applied.
   - Title click and details panel are disabled for applied jobs.
 - `JobItem.styles.ts`: added `AppliedStamp` styled component (green border, rotated −8°).
 
+### ADAM API integration enabled (2026-04-26)
+- Added `ADAM_API_BASE_URL` and `ADAM_API_TOKEN` to `ikea-email-service/.env` and `ikea-jobs-server/.env` (not committed — stays on server).
+- Enabled live job fetching in `adamGetDataFromApi()` — removed stub `return null`, now calls `Career/GetOrdersDetails`.
+- Enabled `AddCandidateWithFiles()` — removed stub, now calls `Candidate/AddCandidateWithFiles`.
+- Added `sendToAdam()` in `applicationController.js`: on every application submission, sends candidate details to ADAM in parallel with the emails (uses `node-fetch`, errors are logged but do not block the response).
+
 ### Single open job card at a time (2026-04-26)
 - Opening a job card now closes any previously open card.
 - Lifted `isOpen` state from `JobItem` to `JobsList` (`openJobId` state).

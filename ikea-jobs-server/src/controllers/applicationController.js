@@ -1,4 +1,33 @@
 const { sendCandidateEmail, sendRecruiterEmail } = require('../services/mailer');
+const fetch = require('node-fetch');
+
+const ADAM_BASE_URL = process.env.ADAM_API_BASE_URL;
+const ADAM_TOKEN    = process.env.ADAM_API_TOKEN;
+
+async function sendToAdam({ firstName, lastName, phone, email, orderId }) {
+    try {
+        const response = await fetch(`${ADAM_BASE_URL}Candidate/AddCandidateWithFiles`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: ADAM_TOKEN,
+                phones: [phone],
+                candidateDetails: {
+                    first_name: firstName,
+                    last_name:  lastName,
+                    phone1:     phone,
+                    Email:      email,
+                },
+                orders: orderId ? [{ order_no: orderId }] : [],
+                ReplaceCandDetails: true,
+            }),
+        });
+        const data = await response.json();
+        console.log('ADAM response:', data);
+    } catch (err) {
+        console.error('ADAM AddCandidateWithFiles error:', err.message);
+    }
+}
 
 const handleApplication = async (req, res) => {
     try {
@@ -15,6 +44,7 @@ const handleApplication = async (req, res) => {
         await Promise.all([
             sendCandidateEmail({ fullName, email, phone, jobTitle, jobBranch }),
             sendRecruiterEmail({ fullName, email, phone, jobTitle, jobBranch, jobDomain }, req.file || null),
+            sendToAdam({ firstName, lastName, phone, email, orderId: job.order_id }),
         ]);
 
         res.status(200).json({ success: true, message: 'Emails sent successfully' });

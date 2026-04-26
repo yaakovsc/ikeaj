@@ -8,14 +8,7 @@ const CONFIG_FILE = path.join(__dirname, "../../config.json");
 const BASE_URL = process.env.ADAM_API_BASE_URL;
 const token = process.env.ADAM_API_TOKEN;
 
-// TODO: Reading jobs from ADAM — will be enabled once ADAM_API_BASE_URL and
-// ADAM_API_TOKEN are provided by IKEA IT. Until then, always returns null so
-// the system falls back to the local JSON cache.
 async function adamGetDataFromApi() {
-  console.log("ADAM integration pending — skipping live fetch, using local cache");
-  return null;
-
-  /* --- enable when ADAM credentials are available ---
   try {
     const url = `${BASE_URL}Career/GetOrdersDetails`;
     const response = await axios.post(
@@ -35,7 +28,6 @@ async function adamGetDataFromApi() {
     console.error("adam error:", error.message);
     return null;
   }
-  --- */
 }
 
 function readConfig() {
@@ -105,14 +97,7 @@ async function getJobsWithCache() {
   }
 }
 
-// TODO: Sending application to ADAM — will be enabled once ADAM_API_BASE_URL
-// and ADAM_API_TOKEN are provided and the candidate payload structure is confirmed
-// with IKEA IT. Until then, applications are delivered by email only (mailer.js).
 async function AddCandidateWithFiles(candidateDetails) {
-  console.log("ADAM integration pending — application not forwarded to ADAM", candidateDetails);
-  return null;
-
-  /* --- enable when ADAM credentials and payload spec are available ---
   const url = `${BASE_URL}Candidate/AddCandidateWithFiles`;
   try {
     const response = await axios.post(
@@ -135,7 +120,6 @@ async function AddCandidateWithFiles(candidateDetails) {
     console.error("ADAM AddCandidateWithFiles error:", error.response?.data || error.message);
     return null;
   }
-  --- */
 }
 
 module.exports = {
