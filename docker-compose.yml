@@ -25,6 +25,8 @@ services:
       - "3001"
     env_file:
       - ./.env
+    environment:
+      PORT: "3001"
     networks:
       - web
 
@@ -36,6 +38,8 @@ services:
       - "3002"
     env_file:
       - ./.env
+    environment:
+      PORT: "3002"
     volumes:
       - adam-data:/app/src/assets
       - ./ikea-email-service/last_fetch.txt:/app/last_fetch.txt
