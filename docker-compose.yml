@@ -24,7 +24,7 @@ services:
     expose:
       - "3001"
     env_file:
-      - ./ikea-jobs-server/.env
+      - ./.env
     networks:
       - web
 
@@ -35,7 +35,7 @@ services:
     expose:
       - "3002"
     env_file:
-      - ./ikea-email-service/.env
+      - ./.env
     volumes:
       - adam-data:/app/src/assets
       - ./ikea-email-service/last_fetch.txt:/app/last_fetch.txt
