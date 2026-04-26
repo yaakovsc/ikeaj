@@ -4,8 +4,19 @@ const fetch = require('node-fetch');
 const ADAM_BASE_URL = process.env.ADAM_API_BASE_URL;
 const ADAM_TOKEN    = process.env.ADAM_API_TOKEN;
 
-async function sendToAdam({ firstName, lastName, phone, email, orderId }) {
+async function sendToAdam({ firstName, lastName, phone, email, orderId, cvFile }) {
     try {
+        const files = [];
+        if (cvFile) {
+            const filename = Buffer.from(cvFile.originalname, 'latin1').toString('utf8');
+            files.push({
+                base64FileData:      cvFile.buffer.toString('base64'),
+                filename,
+                fileCode:            '1',
+                documentDescription: 'קורות חיים',
+            });
+        }
+
         const response = await fetch(`${ADAM_BASE_URL}Candidate/AddCandidateWithFiles`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -19,6 +30,7 @@ async function sendToAdam({ firstName, lastName, phone, email, orderId }) {
                     Email:      email,
                 },
                 orders: orderId ? [{ order_no: orderId }] : [],
+                files,
                 ReplaceCandDetails: true,
             }),
         });
@@ -44,7 +56,7 @@ const handleApplication = async (req, res) => {
         await Promise.all([
             sendCandidateEmail({ fullName, email, phone, jobTitle, jobBranch }),
             sendRecruiterEmail({ fullName, email, phone, jobTitle, jobBranch, jobDomain }, req.file || null),
-            sendToAdam({ firstName, lastName, phone, email, orderId: job.order_id }),
+            sendToAdam({ firstName, lastName, phone, email, orderId: job.order_id, cvFile: req.file || null }),
         ]);
 
         res.status(200).json({ success: true, message: 'Emails sent successfully' });
