@@ -49,7 +49,10 @@ function readConfig() {
 
 function readLastFetchTime() {
   if (!fs.existsSync(LAST_FETCH_FILE)) return null;
-  return new Date(fs.readFileSync(LAST_FETCH_FILE, "utf8"));
+  const content = fs.readFileSync(LAST_FETCH_FILE, "utf8").trim();
+  if (!content) return null;
+  const d = new Date(content);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 function readLocalData() {
