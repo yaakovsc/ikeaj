@@ -2,7 +2,8 @@ const { sendCandidateEmail, sendRecruiterEmail } = require('../services/mailer')
 
 const handleApplication = async (req, res) => {
     try {
-        const { fullName, email, phone } = req.body;
+        const { firstName, lastName, email, phone } = req.body;
+        const fullName = `${firstName} ${lastName}`;
         const job = typeof req.body.job === 'string'
             ? JSON.parse(req.body.job)
             : req.body.job || {};

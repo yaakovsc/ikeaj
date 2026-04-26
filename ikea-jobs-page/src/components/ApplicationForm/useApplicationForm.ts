@@ -52,7 +52,8 @@ export const useApplicationForm = (job: Job, onApplied?: () => void): UseApplica
     resolver: zodResolver(applicationSchema),
     mode: 'onBlur',
     defaultValues: {
-      fullName: '',
+      firstName: '',
+      lastName: '',
       email: '',
       phone: '',
     },
@@ -63,7 +64,8 @@ export const useApplicationForm = (job: Job, onApplied?: () => void): UseApplica
     const savedData = loadApplicationData();
     if (savedData) {
       methods.reset({
-        fullName: savedData.fullName,
+        firstName: savedData.firstName,
+        lastName: savedData.lastName,
         email: savedData.email,
         phone: savedData.phone,
       });
@@ -78,7 +80,8 @@ export const useApplicationForm = (job: Job, onApplied?: () => void): UseApplica
       try {
         // Save data to localStorage (excluding cvFile)
         saveApplicationData({
-          fullName: data.fullName,
+          firstName: data.firstName,
+          lastName: data.lastName,
           email: data.email,
           phone: data.phone,
         });

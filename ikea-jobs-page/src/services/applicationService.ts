@@ -1,7 +1,8 @@
 import { Job } from '../types';
 
 interface ApplicationData {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   cvFile?: FileList;
@@ -20,9 +21,10 @@ export const sendJobApplication = async (
 ): Promise<SendApplicationResult> => {
   try {
     const form = new FormData();
-    form.append('fullName', applicationData.fullName);
-    form.append('email',    applicationData.email);
-    form.append('phone',    applicationData.phone);
+    form.append('firstName', applicationData.firstName);
+    form.append('lastName',  applicationData.lastName);
+    form.append('email',     applicationData.email);
+    form.append('phone',     applicationData.phone);
     form.append('job',      JSON.stringify(job));
 
     const cvFile = applicationData.cvFile?.[0];

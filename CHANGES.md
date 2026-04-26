@@ -81,6 +81,12 @@ It should be updated whenever a new bug fix is applied.
 - Updated `ikea-jobs-server/src/controllers/applicationController.js`: webhook call runs in parallel with ActiveTrail emails; parses `job` field from JSON string.
 - Updated `ikea-jobs-page/src/services/activeTrailService.ts`: frontend now sends `FormData` (instead of JSON) including the CV file.
 
+### Split full name into first name + last name (2026-04-26)
+- ApplicationForm now has two separate fields: שם פרטי and שם משפחה.
+- Updated schema.ts, storage.ts, useApplicationForm.ts, applicationService.ts, applicationController.js.
+- Server composes fullName = firstName + lastName for email display.
+- localStorage auto-fill updated to save/restore firstName and lastName separately.
+
 ### Access gate token screen (2026-04-26)
 - Added full-screen overlay on page load requiring a token to enter.
 - Shows "קובי שלזינגר תוכנה" branding and a password input (asterisks only).

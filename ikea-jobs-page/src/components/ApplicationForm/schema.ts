@@ -30,7 +30,12 @@ import { VALIDATION_PATTERNS, ERROR_MESSAGES } from './constants';
  * ```
  */
 export const applicationSchema = z.object({
-  fullName: z
+  firstName: z
+    .string()
+    .min(2, ERROR_MESSAGES.NAME_TOO_SHORT)
+    .regex(VALIDATION_PATTERNS.NAME, ERROR_MESSAGES.NAME_INVALID_CHARS)
+    .transform(sanitizeInput),
+  lastName: z
     .string()
     .min(2, ERROR_MESSAGES.NAME_TOO_SHORT)
     .regex(VALIDATION_PATTERNS.NAME, ERROR_MESSAGES.NAME_INVALID_CHARS)

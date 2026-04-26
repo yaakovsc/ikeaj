@@ -47,19 +47,36 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ job, onApplied }) => 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormRow>
-            <FieldWrapper error={!!errors.fullName}>
-              <label htmlFor="fullName">שם מלא *</label>
+            <FieldWrapper error={!!errors.firstName}>
+              <label htmlFor="firstName">שם פרטי *</label>
               <StyledInput
-                id="fullName"
-                {...register('fullName')}
-                placeholder="הזן שם מלא"
-                error={!!errors.fullName}
-                aria-invalid={!!errors.fullName}
-                aria-describedby={errors.fullName ? 'fullName-error' : undefined}
+                id="firstName"
+                {...register('firstName')}
+                placeholder="שם פרטי"
+                error={!!errors.firstName}
+                aria-invalid={!!errors.firstName}
+                aria-describedby={errors.firstName ? 'firstName-error' : undefined}
               />
-              {errors.fullName && (
-                <span id="fullName-error" className="error" role="alert">
-                  {errors.fullName.message}
+              {errors.firstName && (
+                <span id="firstName-error" className="error" role="alert">
+                  {errors.firstName.message}
+                </span>
+              )}
+            </FieldWrapper>
+
+            <FieldWrapper error={!!errors.lastName}>
+              <label htmlFor="lastName">שם משפחה *</label>
+              <StyledInput
+                id="lastName"
+                {...register('lastName')}
+                placeholder="שם משפחה"
+                error={!!errors.lastName}
+                aria-invalid={!!errors.lastName}
+                aria-describedby={errors.lastName ? 'lastName-error' : undefined}
+              />
+              {errors.lastName && (
+                <span id="lastName-error" className="error" role="alert">
+                  {errors.lastName.message}
                 </span>
               )}
             </FieldWrapper>

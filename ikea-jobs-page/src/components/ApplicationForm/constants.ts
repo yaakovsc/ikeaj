@@ -27,8 +27,8 @@ export const VALIDATION_PATTERNS = {
  * Keep them clear, concise, and actionable.
  */
 export const ERROR_MESSAGES = {
-  NAME_TOO_SHORT: 'שם מלא חייב להכיל לפחות 2 תווים',
-  NAME_INVALID_CHARS: 'השם חייב להכיל אותיות בלבד',
+  NAME_TOO_SHORT: 'חייב להכיל לפחות 2 תווים',
+  NAME_INVALID_CHARS: 'אותיות בלבד',
   EMAIL_INVALID: 'כתובת אימייל לא תקינה',
   PHONE_INVALID: 'מספר טלפון לא תקין (050-1234567)',
   SUBMISSION_ERROR: 'שגיאה בשליחת המועמדות',
@@ -52,7 +52,8 @@ export const FILE_CONFIG = {
  * and enable easy refactoring.
  */
 export const FORM_FIELDS = {
-  FULL_NAME: 'fullName',
+  FIRST_NAME: 'firstName',
+  LAST_NAME: 'lastName',
   EMAIL: 'email',
   PHONE: 'phone',
   CV_FILE: 'cvFile',

@@ -8,11 +8,9 @@ const STORAGE_KEY = 'ikea_job_application_data';
  * Stored application data interface
  */
 interface StoredApplicationData {
-  /** Candidate's full name */
-  fullName: string;
-  /** Candidate's email address */
+  firstName: string;
+  lastName: string;
   email: string;
-  /** Candidate's phone number */
   phone: string;
 }
 
