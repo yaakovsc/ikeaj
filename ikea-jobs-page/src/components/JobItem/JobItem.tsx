@@ -30,11 +30,13 @@ import {
 
 interface JobItemProps {
   job: Job;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-const JobItem: React.FC<JobItemProps> = ({ job }) => {
+const JobItem: React.FC<JobItemProps> = ({ job, isOpen, onToggle }) => {
   const [hasApplied, setHasApplied] = useState(() => hasAppliedToJob(job.order_id));
-  const { isOpen, toggleOpen, shareOnWhatsApp, shareOnFacebook } = useJobItem(job);
+  const { shareOnWhatsApp, shareOnFacebook } = useJobItem(job);
 
   const sanitizedNotes = React.useMemo(
     () => DOMPurify.sanitize(job.notes),
@@ -49,7 +51,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
   return (
     <JobCard>
       <CardTop>
-        <JobTitle onClick={hasApplied ? undefined : toggleOpen} style={hasApplied ? { cursor: 'default', textDecoration: 'none' } : undefined}>
+        <JobTitle onClick={hasApplied ? undefined : onToggle} style={hasApplied ? { cursor: 'default', textDecoration: 'none' } : undefined}>
           {job.description}
         </JobTitle>
         {daysRemaining >= 0 && daysRemaining <= 14 && (
@@ -109,7 +111,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
             <span className="stamp-en">APPLIED</span>
           </AppliedStamp>
         ) : (
-          <ExpandButton onClick={toggleOpen} aria-expanded={isOpen}>
+          <ExpandButton onClick={onToggle} aria-expanded={isOpen}>
             {isOpen ? 'סגור' : 'לפרטים ולהגשה'}
             <KeyboardArrowDownIcon
               style={{

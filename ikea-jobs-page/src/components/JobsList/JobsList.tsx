@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import JobItem from '../JobItem';
 import FilterDropdown from './FilterDropdown';
@@ -32,6 +32,8 @@ import {
 } from './JobsList.styles';
 
 const JobsList: React.FC = () => {
+  const [openJobId, setOpenJobId] = useState<number | null>(null);
+
   const {
     filteredJobs,
     searchTerm,
@@ -175,7 +177,12 @@ const JobsList: React.FC = () => {
               Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
             ) : filteredJobs.length > 0 ? (
               filteredJobs.map((job, index) => (
-                <JobItem key={generateJobKey(job, index)} job={job} />
+                <JobItem
+                  key={generateJobKey(job, index)}
+                  job={job}
+                  isOpen={openJobId === job.order_id}
+                  onToggle={() => setOpenJobId(prev => prev === job.order_id ? null : job.order_id)}
+                />
               ))
             ) : (
               <NoResults role="alert">{LABELS.NO_RESULTS}</NoResults>
