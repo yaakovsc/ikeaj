@@ -7,8 +7,13 @@ const axios = require('axios');
 const fs    = require('fs');
 const path  = require('path');
 
-const BASE_URL = process.env.ADAM_API_BASE_URL || 'https://services.adamtotal.co.il/api/';
-const TOKEN    = process.env.ADAM_API_TOKEN    || '45563CBE-BA8F-4960-8198-0D4C334DD29C';
+const BASE_URL = process.env.ADAM_API_BASE_URL;
+const TOKEN    = process.env.ADAM_API_TOKEN;
+
+if (!BASE_URL || !TOKEN) {
+  console.error('Missing ADAM_API_BASE_URL or ADAM_API_TOKEN — run with env vars set');
+  process.exit(1);
+}
 
 // ── Minimal valid PDF (empty 1-page) in base64 ──────────────────────────────
 const DUMMY_PDF_BASE64 =
