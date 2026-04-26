@@ -165,6 +165,11 @@ It should be updated whenever a new bug fix is applied.
   - Title click and details panel are disabled for applied jobs.
 - `JobItem.styles.ts`: added `AppliedStamp` styled component (green border, rotated −8°).
 
+### Single open job card at a time (2026-04-26)
+- Opening a job card now closes any previously open card.
+- Lifted `isOpen` state from `JobItem` to `JobsList` (`openJobId` state).
+- `JobItem` now receives `isOpen` and `onToggle` as props instead of managing local state.
+
 ### Seed script for test job data
 - Added `ikea-email-service/seed-jobs.js` — generates N realistic IKEA Israel job postings.
 - Usage: `node seed-jobs.js [N]` (default 15).
