@@ -89,11 +89,13 @@ async function getJobsWithCache() {
       console.log("Refreshing from API...");
       const jobs = await adamGetDataFromApi();
       if (jobs) return { jobs, source: 'live' };
-      // ADAM unreachable — fall back to local cache
+      // ADAM truly unreachable — serve stale cache with warning
       console.warn("ADAM unavailable — serving local cache");
+      return { jobs: localData, source: 'cache' };
     }
 
-    return { jobs: localData, source: 'cache' };
+    // Cache is fresh — no need to call ADAM, no warning
+    return { jobs: localData, source: 'live' };
   } catch (err) {
     console.error("cache error:", err);
     return null;
