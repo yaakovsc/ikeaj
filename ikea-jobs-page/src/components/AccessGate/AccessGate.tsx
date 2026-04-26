@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 
-const CORRECT_TOKEN = 'jumpstartxx2!';
 const SESSION_KEY = 'ikea_access_granted';
+const SERVER_URL  = process.env.REACT_APP_JOBS_SERVER_URL || 'http://localhost:3001';
+const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY || '';
 
 const overlay: React.CSSProperties = {
   position: 'fixed', inset: 0, zIndex: 9999,
@@ -15,22 +17,22 @@ const box: React.CSSProperties = {
   gap: 20, minWidth: 320, boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
 };
 
-const title: React.CSSProperties = {
+const titleStyle: React.CSSProperties = {
   fontSize: 22, fontWeight: 700, color: '#111', textAlign: 'center',
   fontFamily: 'Arial, sans-serif',
 };
 
-const subtitle: React.CSSProperties = {
+const subtitleStyle: React.CSSProperties = {
   fontSize: 14, color: '#555', textAlign: 'center', fontFamily: 'Arial, sans-serif',
 };
 
-const input: React.CSSProperties = {
+const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 14px', fontSize: 16,
   border: '1.5px solid #ccc', borderRadius: 6, outline: 'none',
   boxSizing: 'border-box', letterSpacing: 4, textAlign: 'center',
 };
 
-const button: React.CSSProperties = {
+const buttonStyle: React.CSSProperties = {
   width: '100%', padding: '11px 0', fontSize: 16, fontWeight: 700,
   background: '#0058a3', color: '#fff', border: 'none',
   borderRadius: 6, cursor: 'pointer',
@@ -44,19 +46,45 @@ export const AccessGate: React.FC<{ children: React.ReactNode }> = ({ children }
   const [granted, setGranted] = useState(
     () => sessionStorage.getItem(SESSION_KEY) === '1'
   );
-  const [token, setToken] = useState('');
-  const [error, setError] = useState(false);
+  const [token, setToken]   = useState('');
+  const [error, setError]   = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   if (granted) return <>{children}</>;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (token === CORRECT_TOKEN) {
-      sessionStorage.setItem(SESSION_KEY, '1');
-      setGranted(true);
-    } else {
-      setError(true);
-      setToken('');
+    setError(null);
+
+    if (RECAPTCHA_SITE_KEY && !recaptchaRef.current?.getValue()) {
+      setError('יש לאשר שאינך רובוט');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(`${SERVER_URL}/api/verify-access`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          recaptchaToken: recaptchaRef.current?.getValue() || '',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        setGranted(true);
+      } else {
+        setError('טוקן שגוי — נסה שנית');
+        setToken('');
+        recaptchaRef.current?.reset();
+      }
+    } catch {
+      setError('שגיאת רשת — נסה שנית');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,19 +92,24 @@ export const AccessGate: React.FC<{ children: React.ReactNode }> = ({ children }
     <>
       <div style={overlay}>
         <form style={box} onSubmit={handleSubmit}>
-          <div style={title}>קובי שלזינגר תוכנה</div>
-          <div style={subtitle}>יש להזין טוקן גישה להמשך</div>
+          <div style={titleStyle}>קובי שלזינגר תוכנה</div>
+          <div style={subtitleStyle}>יש להזין טוקן גישה להמשך</div>
           <input
-            style={input}
+            style={inputStyle}
             type="password"
             placeholder="טוקן"
             value={token}
             autoFocus
-            onChange={e => { setToken(e.target.value); setError(false); }}
+            onChange={e => { setToken(e.target.value); setError(null); }}
             dir="ltr"
           />
-          {error && <div style={errorStyle}>טוקן שגוי — נסה שנית</div>}
-          <button style={button} type="submit">כניסה</button>
+          {RECAPTCHA_SITE_KEY && (
+            <ReCAPTCHA ref={recaptchaRef} sitekey={RECAPTCHA_SITE_KEY} />
+          )}
+          {error && <div style={errorStyle}>{error}</div>}
+          <button style={buttonStyle} type="submit" disabled={loading}>
+            {loading ? '...' : 'כניסה'}
+          </button>
         </form>
       </div>
       {children}
