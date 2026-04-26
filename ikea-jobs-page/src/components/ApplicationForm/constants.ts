@@ -32,6 +32,12 @@ export const ERROR_MESSAGES = {
   EMAIL_INVALID: 'כתובת אימייל לא תקינה',
   PHONE_INVALID: 'מספר טלפון לא תקין (050-1234567)',
   SUBMISSION_ERROR: 'שגיאה בשליחת המועמדות',
+  DELIVERY_FAILED: 'שליחת המועמדות נכשלה. אנא נסה שנית.',
+} as const;
+
+export const SUCCESS_MESSAGES = {
+  FULL: 'המועמדות הוגשה בהצלחה! ניצור איתך קשר בהקדם האפשרי.',
+  EMAIL_FAILED: 'המועמדות הוגשה בהצלחה. שים לב — שליחת אימייל האישור נכשלה.',
 } as const;
 
 /**

@@ -4,22 +4,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Job } from '../../types';
 import { sendJobApplication } from '../../services/applicationService';
 import { applicationSchema, ApplicationFormData } from './schema';
-import { extractErrorMessage } from './utils';
-import { ERROR_MESSAGES } from './constants';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from './constants';
 import { saveApplicationData, loadApplicationData, saveAppliedJob } from './storage';
 /**
  * Return type for useApplicationForm hook
  */
 interface UseApplicationFormReturn {
-  /** React Hook Form methods */
   methods: ReturnType<typeof useForm<ApplicationFormData>>;
-  /** Loading state during submission */
   isSubmitting: boolean;
-  /** Success state after submission */
   success: boolean;
-  /** Error message if submission failed */
+  successMessage: string | null;
   error: string | null;
-  /** Form submission handler */
   onSubmit: (data: ApplicationFormData) => Promise<void>;
 }
 
@@ -46,6 +41,7 @@ interface UseApplicationFormReturn {
 export const useApplicationForm = (job: Job, onApplied?: () => void): UseApplicationFormReturn => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const methods = useForm<ApplicationFormData>({
@@ -87,17 +83,16 @@ export const useApplicationForm = (job: Job, onApplied?: () => void): UseApplica
         });
 
         const result = await sendJobApplication(job, data);
-        //use the email service instead of active trail for sending applications
-        //const result = await sendJobApplicationEmail(job, data);
 
-        if (result.success) {
-          setSuccess(true);
-          methods.setValue('cvFile', undefined);
+        if (result.adamOk) {
+          // ADAM accepted the application — lock the job
           saveAppliedJob(job.order_id);
           onApplied?.();
+          methods.setValue('cvFile', undefined);
+          setSuccessMessage(result.emailOk ? SUCCESS_MESSAGES.FULL : SUCCESS_MESSAGES.EMAIL_FAILED);
+          setSuccess(true);
         } else {
-          const errorMsg = extractErrorMessage(result.error, ERROR_MESSAGES.SUBMISSION_ERROR);
-          setError(errorMsg);
+          setError(ERROR_MESSAGES.DELIVERY_FAILED);
         }
       } catch (err) {
         setError(ERROR_MESSAGES.SUBMISSION_ERROR);
@@ -113,6 +108,7 @@ export const useApplicationForm = (job: Job, onApplied?: () => void): UseApplica
     methods,
     isSubmitting,
     success,
+    successMessage,
     error,
     onSubmit,
   };

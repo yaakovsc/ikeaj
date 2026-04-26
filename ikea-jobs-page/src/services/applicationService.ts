@@ -10,6 +10,8 @@ interface ApplicationData {
 
 interface SendApplicationResult {
   success: boolean;
+  adamOk?: boolean;
+  emailOk?: boolean;
   error?: any;
 }
 
@@ -39,10 +41,15 @@ export const sendJobApplication = async (
 
     if (!response.ok) {
       const errorData = await response.json();
-      return { success: false, error: errorData };
+      return { success: false, adamOk: false, emailOk: false, error: errorData };
     }
 
-    return { success: true };
+    const data = await response.json();
+    return {
+      success: data.success,
+      adamOk:  data.adamOk,
+      emailOk: data.emailOk,
+    };
   } catch (error) {
     console.error('Network error:', error);
     return { success: false, error: 'שגיאת רשת - אנא נסה שוב' };

@@ -22,7 +22,7 @@ interface ApplicationFormProps {
 }
 
 const ApplicationForm: React.FC<ApplicationFormProps> = ({ job, onApplied }) => {
-  const { methods, isSubmitting, success, error, onSubmit } = useApplicationForm(job, onApplied);
+  const { methods, isSubmitting, success, successMessage, error, onSubmit } = useApplicationForm(job, onApplied);
   const { register, handleSubmit, watch, formState: { errors } } = methods;
   
   const cvFile = watch('cvFile');
@@ -32,10 +32,13 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ job, onApplied }) => 
   );
 
   if (success) {
+    const isWarning = successMessage?.includes('נכשלה');
     return (
-      <SuccessMessage>
-        <h3>המועמדות נשלחה בהצלחה</h3>
-        <p>תודה רבה. ניצור איתך קשר בהקדם האפשרי.</p>
+      <SuccessMessage style={isWarning ? { borderColor: '#e65100' } : undefined}>
+        <h3 style={isWarning ? { color: '#e65100' } : undefined}>
+          {isWarning ? 'המועמדות הוגשה' : 'המועמדות נשלחה בהצלחה'}
+        </h3>
+        <p>{successMessage}</p>
       </SuccessMessage>
     );
   }

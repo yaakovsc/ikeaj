@@ -36,8 +36,10 @@ async function sendToAdam({ firstName, lastName, phone, email, orderId, cvFile }
         });
         const data = await response.json();
         console.log('ADAM response:', data);
+        return data;
     } catch (err) {
         console.error('ADAM AddCandidateWithFiles error:', err.message);
+        return null;
     }
 }
 
@@ -53,13 +55,26 @@ const handleApplication = async (req, res) => {
         const jobBranch = job.name_snif            || '';
         const jobDomain = job.order_def_prof_name1 || '';
 
-        await Promise.all([
-            sendCandidateEmail({ fullName, email, phone, jobTitle, jobBranch }),
-            sendRecruiterEmail({ fullName, email, phone, jobTitle, jobBranch, jobDomain }, req.file || null),
-            sendToAdam({ firstName, lastName, phone, email, orderId: job.order_id, cvFile: req.file || null }),
-        ]);
+        // ADAM is the source of truth — must succeed for the application to count
+        const adamResult = await sendToAdam({ firstName, lastName, phone, email, orderId: job.order_id, cvFile: req.file || null });
 
-        res.status(200).json({ success: true, message: 'Emails sent successfully' });
+        if (!adamResult || !adamResult.Candno) {
+            return res.status(200).json({ success: false, adamOk: false, emailOk: false });
+        }
+
+        // Emails are secondary — failure warns but doesn't block
+        let emailOk = true;
+        try {
+            await Promise.all([
+                sendCandidateEmail({ fullName, email, phone, jobTitle, jobBranch }),
+                sendRecruiterEmail({ fullName, email, phone, jobTitle, jobBranch, jobDomain }, req.file || null),
+            ]);
+        } catch (emailErr) {
+            console.error('Email sending failed:', emailErr);
+            emailOk = false;
+        }
+
+        res.status(200).json({ success: true, adamOk: true, emailOk, candno: adamResult.Candno });
     } catch (error) {
         console.error('Application Error:', error);
         res.status(500).json({ success: false, error: 'Failed to send emails' });
