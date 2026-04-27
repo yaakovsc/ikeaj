@@ -56,7 +56,7 @@ location /ikea/ {
 }
 
 location /ikea/api/jobs/ {
-    proxy_pass         http://email-service:3002/;
+    proxy_pass         http://adam-service:3002/;
     proxy_set_header   Host              $host;
     proxy_set_header   X-Real-IP         $remote_addr;
     proxy_set_header   X-Forwarded-Proto $scheme;
@@ -112,7 +112,7 @@ docker exec <your-nginx-container> nginx -s reload
 | View logs | `cd /opt/ikea-jobs && docker compose logs -f` |
 | Stop the app | `cd /opt/ikea-jobs && docker compose down` |
 | Update to latest version | `cd /opt/ikea-jobs && git pull && docker compose up -d --build` |
-| Re-seed test jobs | `cd /opt/ikea-jobs && docker compose exec email-service node seed-jobs.js 15` |
+| Re-seed test jobs | `cd /opt/ikea-jobs && docker compose exec adam-service node seed-jobs.js 15` |
 
 ---
 

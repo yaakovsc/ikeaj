@@ -52,7 +52,7 @@ export const useJobsList = (): UseJobsListReturn => {
 
   const fetchJobs = useCallback(async (): Promise<{ jobs: Job[]; source: string }> => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_EMAIL_SERVICE_URL || 'http://localhost:3002'}/api/fetch-jobs`);
+      const response = await fetch(`${process.env.REACT_APP_ADAM_SERVICE_URL || 'http://localhost:3002'}/api/fetch-jobs`);
       if (!response.ok) throw new Error(`Failed to fetch jobs: ${response.status}`);
       const data: unknown = await response.json();
       const parsed = data as { jobs?: unknown; source?: string };

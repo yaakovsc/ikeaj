@@ -3,6 +3,42 @@
 This file tracks bug-fix changes made in this repository.
 It should be updated whenever a new bug fix is applied.
 
+## 2026-04-27
+
+### Removed access gate (token + reCAPTCHA)
+- Deleted `ikea-jobs-page/src/components/AccessGate/AccessGate.tsx`
+- Deleted `ikea-jobs-server/src/routes/accessRoutes.js`
+- `App.tsx`: removed `<AccessGate>` wrapper — app renders directly
+- `ikea-jobs-server/index.js`: removed `accessRoutes` import and registration
+- `ikea-jobs-server/package.json`: removed `express-rate-limit` dependency
+- `ikea-jobs-page/package.json`: removed `react-google-recaptcha` and `@types/react-google-recaptcha`
+- `ikea-jobs-page/Dockerfile`: removed `REACT_APP_RECAPTCHA_SITE_KEY` build arg
+- `docker-compose.yml`, `docker-compose.standalone.yml`: removed `REACT_APP_RECAPTCHA_SITE_KEY` build arg
+- `.env.example`: removed `ACCESS_TOKEN`, `RECAPTCHA_SECRET_KEY`, `REACT_APP_RECAPTCHA_SITE_KEY`
+- `install.sh`: removed access token and reCAPTCHA prompts; removed from `.env` template
+- `README.md`, `ikea-jobs-page/README.md`: removed all access gate and reCAPTCHA references
+
+### Standalone deployment mode + multi-distro install
+- Added `docker-compose.standalone.yml`: includes nginx (SSL termination) and certbot (auto-renewal) containers; network is internal (not external)
+- `install.sh` rewritten to support Ubuntu, Debian, Fedora, RHEL/AlmaLinux/Rocky
+- `install.sh` now prompts for deployment mode: standalone (fresh server) vs giron (existing nginx)
+- Standalone flow: certbot obtains Let's Encrypt cert before starting containers; generates `nginx-ikea-standalone.conf` with domain substituted
+- Firewall support: ufw (Debian/Ubuntu) and firewalld (Fedora/RHEL); opens 80, 443, 587
+- Docker install now covers apt (Ubuntu/Debian) and dnf (Fedora/RHEL) package managers
+- Install now prompts for `ACCESS_TOKEN` and reCAPTCHA keys (previously missing from script)
+- Single root `.env` is now written by the install script (replaces two separate service `.env` files)
+- `README.md` completely rewritten: architecture diagram, all prerequisites, Gmail SMTP setup guide, both installation modes, management commands, troubleshooting
+
+### Renamed email-service → adam-service
+- Directory renamed: `ikea-email-service` → `ikea-adam-service`
+- Docker service: `email-service` → `adam-service`, container: `ikea-email-service` → `ikea-adam-service`
+- Removed dead code: `src/controllers/applicationController.js`, `src/services/emailService.js` (old email flow replaced by jobs-server long ago)
+- Removed unused `multer` and `nodemailer` dependencies from `package.json`
+- Simplified `routes.js` to only the active route: `GET /api/fetch-jobs`
+- Simplified `index.js`: removed multer error handler (no longer relevant)
+- Renamed build arg and env var: `REACT_APP_EMAIL_SERVICE_URL` → `REACT_APP_ADAM_SERVICE_URL`
+- Updated: `docker-compose.yml`, `nginx-ikea.conf`, `INSTALL.md`, `install.sh`, `ikea-jobs-page/Dockerfile`, `useJobsList.ts`, `.env.example`, `README.md`
+
 ## 2026-04-23
 
 ### Server startup fix

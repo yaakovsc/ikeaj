@@ -7,18 +7,17 @@ services:
       context: ./ikea-jobs-page
       args:
         REACT_APP_JOBS_SERVER_URL: /ikea/api/apply
-        REACT_APP_EMAIL_SERVICE_URL: /ikea/api/jobs
+        REACT_APP_ADAM_SERVICE_URL: /ikea/api/jobs
         PUBLIC_URL: /ikea
-        REACT_APP_RECAPTCHA_SITE_KEY: ${REACT_APP_RECAPTCHA_SITE_KEY:-}
     expose:
       - "80"
     depends_on:
       - jobs-server
-      - email-service
+      - adam-service
     networks:
       - web
 
-  # ── Application / email server (port 3001) ───────────────────────────────
+  # ── Application server (port 3001) ───────────────────────────────────────
   jobs-server:
     container_name: ikea-jobs-server
     build: ./ikea-jobs-server
@@ -32,9 +31,9 @@ services:
       - web
 
   # ── ADAM cache + job-fetch service (port 3002) ───────────────────────────
-  email-service:
-    container_name: ikea-email-service
-    build: ./ikea-email-service
+  adam-service:
+    container_name: ikea-adam-service
+    build: ./ikea-adam-service
     expose:
       - "3002"
     env_file:
@@ -43,8 +42,8 @@ services:
       PORT: "3002"
     volumes:
       - adam-data:/app/src/assets
-      - ./ikea-email-service/last_fetch.txt:/app/last_fetch.txt
-      - ./ikea-email-service/config.json:/app/config.json
+      - ./ikea-adam-service/last_fetch.txt:/app/last_fetch.txt
+      - ./ikea-adam-service/config.json:/app/config.json
     networks:
       - web
 
